@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const logoutContainer = document.getElementById('logout');
   const userLoggedIn = userIsLoggedIn();
 
+  // Get Menu Items
+getMenu();
   // Update login/logout and orders buttons
   if (userLoggedIn) {
     authButtonsContainer.innerHTML = `
@@ -42,6 +44,33 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('click', e => {
     if (e.target === modal) modal.style.display = 'none';
   });
+
+
+
+async function getMenu(){
+  try {
+    const res = await fetch('http://localhost:3030/menu/filtered/items', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      // body: JSON.stringify({ searchTerm: keyword })
+    });
+    const data = await res.json();
+    toggleLoading(false);
+
+    if (!data || data.length === 0) {
+      errorElement.style.display = 'block';
+      return;
+    }
+    displayResults(data);
+  } catch (err) {
+    toggleLoading(false);
+    errorElement.style.display = 'block';
+    console.error('Error fetching recipes:', err);
+  }
+}
+
+
+
 
   // Perform a search via your API (adjust the URL as needed)
   async function performSearch() {
