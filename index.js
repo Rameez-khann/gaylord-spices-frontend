@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     clearMessages();
 
     try {
-      const res = await fetch('http://localhost:3030/recipes/search', {
+      const res = await fetch('http://localhost:3030/menu/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ searchTerm: keyword })
@@ -161,7 +161,7 @@ if(isDelivery) price+=4;
 
 async function submitOrder(order){
   try {
-    const res = await fetch('http://localhost:3030/recipes/order', {
+    const res = await fetch('http://localhost:3030/menu/order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(order)

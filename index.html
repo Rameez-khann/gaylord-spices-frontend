@@ -10,8 +10,12 @@
 
 <body>
     <header class="header">
-        <h1>Gaylord Spices</h1>
-        <p>Search for delicious meal recipes!</p>
+        <div class="header-wrapper">
+            <h1>Gaylord Spices</h1>
+            <p>Search for delicious meal recipes!</p>
+            <!-- Login Button -->
+            <a href="/login.html" class="login-btn">Login</a>
+        </div>
     </header>
 
     <section id="loading" class="loading" style="display: none;">
@@ -27,7 +31,6 @@
             <input type="text" id="search" placeholder="Enter a keyword (e.g., chicken, pasta)" />
             <button id="search-btn">Search</button>
         </section>
-
         <section id="results"></section>
     </main>
 
