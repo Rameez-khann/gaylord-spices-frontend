@@ -1,47 +1,4 @@
-/* body {
-    font-family: Arial, sans-serif;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f5f5f5;
-}
-
-
-.header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.search-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
-}
-
-#search {
-    padding: 10px;
-    width: 300px;
-    border: 1px solid #ddd;
-    border-radius: 4px 0 0 4px;
-    font-size: 16px;
-}
-
-#search-btn {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 0 4px 4px 0;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-#search-btn:hover {
-    background-color: #45a049;
-} */
-
-/* style.css */
-
+/* Base Styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
@@ -69,6 +26,7 @@ header.header p {
     font-size: 1.2rem;
 }
 
+/* Search Section */
 .search-container {
     display: flex;
     justify-content: center;
@@ -99,9 +57,10 @@ header.header p {
 }
 
 .search-container button:hover {
-    background-color: #fffaf6;
+    background-color: #ad0d2b;
 }
 
+/* Loading and Error Messages */
 .loading,
 .error-message {
     text-align: center;
@@ -114,6 +73,7 @@ header.header p {
     color: #c62828;
 }
 
+/* Results Grid and Recipe Cards */
 #results {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -151,48 +111,109 @@ header.header p {
     padding: 0 1rem 1rem;
     margin: 0;
     font-size: 0.95rem;
-    color:crimson;
+    color: crimson;
 }
 
-.view-recipe{
-    margin:6px;
-    padding:6px;
+.view-recipe {
+    margin: 6px;
+    padding: 6px;
     border-radius: 5px;
-    background-color:#095579 ;
+    background-color: #095579;
     color: white;
-    border:none;
+    border: none;
     font-size: medium;
-}
-
-/* Modal Styling */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 1rem;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-}
-
-.close-btn {
-    position: absolute;
-    top: 1rem;
-    right: 1.5rem;
-    font-size: 1.5rem;
     cursor: pointer;
+}
+
+/* --- Modal Styles --- */
+
+/* Modal Overlay */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);  /* Darker overlay for less transparency */
+  display: none;  /* Hidden by default; shown via JS */
+  justify-content: center;  /* Center modal content horizontally */
+  align-items: center;      /* Center modal content vertically */
+  z-index: 1000;
+  padding: 1rem;
+}
+
+/* Modal Content */
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Close Button */
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  color: #333;
+  cursor: pointer;
+}
+
+/* --- Order Form Styling --- */
+form label {
+  display: block;
+  margin: 1rem 0 0.4rem;
+  font-weight: 500;
+}
+
+form input[type="text"],
+form input[type="tel"],
+form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+form input:focus,
+form textarea:focus {
+  outline: none;
+  border-color: crimson;
+}
+
+form input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+#deliveryAddress {
+  margin-top: 1rem;
+  background-color: #fff7f7;
+  padding: 1rem;
+  border-left: 4px solid crimson;
+  border-radius: 0.5rem;
+}
+
+form button[type="submit"] {
+  margin-top: 1.5rem;
+  background-color: #095579;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button[type="submit"]:hover {
+  background-color: #063d5b;
 }
