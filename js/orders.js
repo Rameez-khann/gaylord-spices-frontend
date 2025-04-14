@@ -1,34 +1,75 @@
-const recipeDetails = document.getElementById('recipe-details');
+document.addEventListener("DOMContentLoaded", () => {
+    const pendingTable = document.querySelector("#pendingOrders tbody");
+    const deliveredTable = document.querySelector("#deliveredOrders tbody");
+    const isLoggedIn = localStorage.getItem('token');
 
-// export 
-
-// Function to handle order submission (you can adapt this to your backend or API)
-function submitOrder(name, phone, orderType, address) {
-    const orderData = {
-        name,
-        phone,
-        orderType,
-        address: orderType === 'delivery' ? address : 'N/A', // Set 'N/A' if pick-up
-        meal: meal.strMeal
-    };
-
-    console.log("Order submitted:", orderData);
-    
-    // Example of sending the order data to a server (you would need to replace this with your actual server endpoint)
-    fetch('/submit-order', {
-        method: 'POST',
+    if(!isLoggedIn){
+        alert("Log in First");
+        window.location.assign('/login.html')
+    }
+  
+    // Fetch and render all orders
+    function fetchOrders() {
+      fetch("http://localhost:3030/orders/grouped")
+        .then((res) => res.json())
+        .then(({ pendingOrders, deliveredOrders }) => {
+          renderOrders(pendingOrders, pendingTable, true);
+          renderOrders(deliveredOrders, deliveredTable, false);
+        })
+        .catch((err) => {
+          console.error("Failed to load orders:", err);
+        });
+    }
+  
+    // Render orders into the given table
+    function renderOrders(orders, tableBody, isPending) {
+      tableBody.innerHTML = "";
+  
+      orders.forEach((order) => {
+        const row = document.createElement("tr");
+  
+        row.innerHTML = `
+          <td>${order.meal}</td>
+          <td>${order.userName}</td>
+          <td>${order.userPhone}</td>
+          <td>${order.isDelivery ? "Yes" : "No"}</td>
+          <td>${order.deliveryAddress || '*Collection'}</td>
+          <td>€${order.price.toFixed(2)}</td>
+        `;
+  
+        if (isPending) {
+          const actionCell = document.createElement("td");
+          const button = document.createElement("button");
+          button.className = "mark-delivered";
+          button.textContent = "Mark as Delivered";
+          button.onclick = () => markAsDelivered(order);
+          actionCell.appendChild(button);
+          row.appendChild(actionCell);
+        }
+  
+        tableBody.appendChild(row);
+      });
+    }
+  
+    // Mark order as delivered and refresh orders
+    function markAsDelivered(order) {
+      fetch(`http://localhost:3030/orders/mark-as-delivered/${order.id}`, {
+        method: "GET",
         headers: {
-            'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(orderData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert('Order placed successfully!');
-        modal.style.display = 'none';  // Close the modal after submission
-    })
-    .catch(error => {
-        console.error('Error submitting order:', error);
-        alert('There was an error placing your order. Please try again.');
-    });
-}
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to update order");
+          fetchOrders(); // Refresh list after update
+        })
+        .catch((err) => {
+          console.error("Delivery update failed:", err);
+          alert("Could not update order. Try again.");
+        });
+    }
+  
+    // Initial fetch
+    fetchOrders();
+  });
+  
