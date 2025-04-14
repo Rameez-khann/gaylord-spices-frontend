@@ -238,6 +238,20 @@ form button[type="submit"]:hover {
   transition: background-color 0.3s ease;
 }
 
-.login-btn:hover {
-  background-color: #d11a2a;
+#logout {
+  display: flex;
+  flex-direction: row-reverse;
+  padding: 8px;
+  background-color: #142e3a;
+
+
+  a{
+    color: white;
+    background-color: #d11a2a;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
 }
+
+

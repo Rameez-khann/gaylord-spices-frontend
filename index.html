@@ -8,13 +8,17 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 
+<section id="logout"></section>
+
 <body>
     <header class="header">
         <div class="header-wrapper">
             <h1>Gaylord Spices</h1>
             <p>Search for delicious meal recipes!</p>
-            <!-- Login Button -->
-            <a href="/login.html" class="login-btn">Login</a>
+            <!-- Auth Buttons: login/logout and orders -->
+            <div id="auth-buttons">
+                <a href="/login.html" class="login-btn">Login</a>
+            </div>
         </div>
     </header>
 
@@ -26,13 +30,19 @@
         <p>No recipes found. Try a different keyword!</p>
     </section>
 
+
     <main>
         <section class="search-container">
             <input type="text" id="search" placeholder="Enter a keyword (e.g., chicken, pasta)" />
             <button id="search-btn">Search</button>
+
         </section>
+
+
         <section id="results"></section>
     </main>
+
+
 
     <!-- Modal for recipe details / order form -->
     <div id="modal" class="modal">
