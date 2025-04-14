@@ -144,8 +144,10 @@ if(isDelivery) price+=4;
         meal: meal.strMeal,
         price: price,
       };
-      console.log('Order Details:', orderDetails);
-      alert('Your order has been submitted!');
+
+// Submitting the order
+
+    submitOrder(orderDetails);
       modal.style.display = 'none';
     });
 
@@ -156,4 +158,22 @@ if(isDelivery) price+=4;
     // Show the modal using Flex display to trigger centering per CSS
     modal.style.display = 'flex';
   }
+
+async function submitOrder(order){
+  try {
+    const res = await fetch('http://localhost:3030/recipes/order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(order)
+    });
+    const data = await res.json();
+ alert("Order Submitted Successfully")
+  } catch (err) {
+    toggleLoading(false);
+    errorElement.style.display = 'block';
+    console.error('Error fetching recipes:', err);
+  }
+}
+
+
 });
