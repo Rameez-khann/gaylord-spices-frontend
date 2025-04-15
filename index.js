@@ -142,9 +142,10 @@ document.addEventListener('click', function (e) {
 
   function addToCart(meal) {
     meal.id = new Date().getTime()
-    let cart = JSON.parse(localStorage.getItem('orderCart')) || [];
+    let cart = getCart();
     cart.push(meal);
     localStorage.setItem('orderCart', JSON.stringify(cart));
+  getTotalAmount();
     // alert(`${meal.strMeal} added to cart.`);
   }
 
@@ -192,12 +193,20 @@ document.addEventListener('click', function (e) {
       deliveryAddressSection.style.display = deliveryOption.checked ? 'block' : 'none';
     });
 
+    const calculateTotalAmount = (cart, isDelivery) => {
+      let total = cart.reduce((sum, meal) => sum + Number(meal.price), 0);
+      if (isDelivery) total += 4; // delivery fee
+      return total;
+    };
+    
+
     orderForm.addEventListener('submit', (event) => {
       event.preventDefault();
       const userName = orderForm.userName.value.trim();
       const userPhone = orderForm.userPhone.value.trim();
       const isDelivery = deliveryOption.checked;
       const deliveryAddress = isDelivery ? orderForm.userAddress.value.trim() : null;
+      const orders =[];
 
       if (!userName || !userPhone || (isDelivery && !deliveryAddress)) {
         alert('Please fill in all required fields.');
@@ -207,13 +216,14 @@ document.addEventListener('click', function (e) {
       let price = Number(meal.price);
       if (isDelivery) price += 4;
 
+      const cart = getCart();
+
       const orderDetails = {
         userName,
         userPhone,
         isDelivery,
         deliveryAddress,
-        meal: meal.strMeal,
-        price: price,
+        cart
       };
 
       submitOrder(orderDetails);
@@ -229,19 +239,19 @@ document.addEventListener('click', function (e) {
   async function submitOrder(order) {
     console.log({order});
     
-    // try {
-    //   const res = await fetch('http://localhost:3030/menu/order', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(order)
-    //   });
-    //   const data = await res.json();
-    //   alert("Order Submitted Successfully");
-    // } catch (err) {
-    //   toggleLoading(false);
-    //   errorElement.style.display = 'block';
-    //   console.error('Error submitting order:', err);
-    // }
+    try {
+      const res = await fetch('http://localhost:3030/menu/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(order)
+      });
+      const data = await res.json();
+      alert("Order Submitted Successfully");
+    } catch (err) {
+      toggleLoading(false);
+      errorElement.style.display = 'block';
+      console.error('Error submitting order:', err);
+    }
   }
 
   function userIsLoggedIn() {
@@ -251,201 +261,177 @@ document.addEventListener('click', function (e) {
 
   document.getElementById('cart-btn').addEventListener('click', displayCart);
 
-// function displayCart() {
-//   const cart = JSON.parse(localStorage.getItem('orderCart')) || [];
-//   recipeDetails.innerHTML = '';
 
-//   if (cart.length === 0) {
-//     recipeDetails.innerHTML = '<p>Your cart is empty.</p>';
-//     modal.style.display = 'flex';
-//     return;
-//   }
-
-//   const list = document.createElement('div');
-//   list.className = 'cart-list';
-
-//   cart.forEach((meal, index) => {
-//     const item = document.createElement('div');
-//     item.className = 'cart-item';
-//     item.style.display = 'flex';
-//     item.style.alignItems = 'center';
-//     item.style.gap = '15px';
-//     item.style.marginBottom = '10px';
-
-//     item.innerHTML = `
-//       <img src="${meal.strMealThumb}" alt="${meal.strMeal}" style="width: 80px; height: 80px; border-radius: 8px;">
-//       <div style="flex-grow: 1">
-//         <h4>${meal.strMeal}</h4>
-//         <p>${meal.strCategory} | ${meal.strArea}</p>
-//         <p>€${meal.price}</p>
-//       </div>
-//     `;
-
-//     // Create and add remove button
-//     const removeBtn = document.createElement('button');
-//     removeBtn.textContent = 'Remove';
-//     removeBtn.style.padding = '8px';
-//     removeBtn.style.backgroundColor = '#ff5555';
-//     removeBtn.style.color = 'white';
-//     removeBtn.style.border = 'none';
-//     removeBtn.style.borderRadius = '6px';
-//     removeBtn.style.cursor = 'pointer';
-
-//     removeBtn.addEventListener('click', () => {
-//       removeFromCart(index);
-//       displayCart(); // Refresh modal
-//     });
-
-//     item.appendChild(removeBtn);
-//     list.appendChild(item);
-//   });
-
-//   const orderBtn = document.createElement('button');
-//   orderBtn.textContent = 'Submit All Orders';
-//   orderBtn.style.marginTop = '15px';
-//   orderBtn.addEventListener('click', () => {
-//     cart.forEach(submitOrder);
-//     localStorage.removeItem('orderCart');
-//     modal.style.display = 'none';
-//   });
-
-//   recipeDetails.appendChild(list);
-//   recipeDetails.appendChild(orderBtn);
-//   modal.style.display = 'flex';
-// }
-
-function displayCart() {
-  const cart = JSON.parse(localStorage.getItem('orderCart')) || [];
-  recipeDetails.innerHTML = '';
-
-  if (cart.length === 0) {
-    recipeDetails.innerHTML = '<p>Your cart is empty.</p>';
+  function displayCart() {
+    const cart = getCart();
+    recipeDetails.innerHTML = '';
     modal.style.display = 'flex';
-    return;
-  }
-
-  const list = document.createElement('div');
-  list.className = 'cart-list';
-
-  cart.forEach((meal, index) => {
-    const item = document.createElement('div');
-    item.className = 'cart-item';
-    item.style.display = 'flex';
-    item.style.alignItems = 'center';
-    item.style.gap = '15px';
-    item.style.marginBottom = '10px';
-
-    item.innerHTML = `
-      <img src="${meal.strMealThumb}" alt="${meal.strMeal}" style="width: 80px; height: 80px; border-radius: 8px;">
-      <div style="flex-grow: 1">
-        <h4>${meal.strMeal}</h4>
-        <p>${meal.strCategory} | ${meal.strArea}</p>
-        <p>€${meal.price}</p>
-      </div>
-    `;
-
-    const removeBtn = document.createElement('button');
-    removeBtn.textContent = 'Remove';
-    removeBtn.style.padding = '8px';
-    removeBtn.style.backgroundColor = '#ff5555';
-    removeBtn.style.color = 'white';
-    removeBtn.style.border = 'none';
-    removeBtn.style.borderRadius = '6px';
-    removeBtn.style.cursor = 'pointer';
-
-    removeBtn.addEventListener('click', () => {
-      removeFromCart(index);
-      displayCart();
-    });
-
-    item.appendChild(removeBtn);
-    list.appendChild(item);
-  });
-
-  // Create form for user details
-  const form = document.createElement('form');
-  form.innerHTML = `
-    <h3>Enter your details:</h3>
-    <label for="userName">Your Name:</label>
-    <input type="text" id="userName" name="userName" required /><br>
-    
-    <label for="userPhone">Your Phone:</label>
-    <input type="tel" id="userPhone" name="userPhone" required /><br>
-    
-    <label for="deliveryOption">Delivery:</label>
-    <input type="checkbox" id="deliveryOption" name="deliveryOption" />
-    <label for="deliveryOption">Check if you want delivery</label><br>
-    
-    <div id="deliveryAddress" style="display: none;">
-      <label for="userAddress">Delivery Address:</label>
-      <textarea id="userAddress" name="userAddress" placeholder="Enter delivery address"></textarea><br>
-      <p>Delivery charge: €4</p>
-    </div>
-    
-    <button type="submit">Submit All Orders</button>
-  `;
-
-  // Toggle delivery section
-  const deliveryCheckbox = form.querySelector('#deliveryOption');
-  const deliveryAddressDiv = form.querySelector('#deliveryAddress');
-  deliveryCheckbox.addEventListener('change', () => {
-    deliveryAddressDiv.style.display = deliveryCheckbox.checked ? 'block' : 'none';
-  });
-
-  // Submit all orders
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const userName = form.userName.value.trim();
-    const userPhone = form.userPhone.value.trim();
-    const isDelivery = deliveryCheckbox.checked;
-    const deliveryAddress = isDelivery ? form.userAddress.value.trim() : null;
-
-    if (!userName || !userPhone || (isDelivery && !deliveryAddress)) {
-      alert('Please fill in all required fields.');
+  
+    if (cart.length === 0) {
+      recipeDetails.innerHTML = '<p>Your cart is empty.</p>';
       return;
     }
-
-    cart.forEach((meal) => {
-      let totalPrice = Number(meal.price);
-      if (isDelivery) totalPrice += 4;
-
+  
+    // Create cart list container
+    const list = document.createElement('div');
+    list.className = 'cart-list';
+  
+    // Populate cart items
+    cart.forEach((meal, index) => {
+      const item = document.createElement('div');
+      item.className = 'cart-item';
+      item.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 10px;
+      `;
+  
+      item.innerHTML = `
+        <img src="${meal.strMealThumb}" alt="${meal.strMeal}" style="width: 80px; height: 80px; border-radius: 8px;">
+        <div style="flex-grow: 1">
+          <h4>${meal.strMeal}</h4>
+          <p>${meal.strCategory} | ${meal.strArea}</p>
+          <p>€${meal.price}</p>
+        </div>
+      `;
+  
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = 'Remove';
+      removeBtn.style.cssText = `
+        padding: 8px;
+        background-color: #ff5555;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      `;
+      removeBtn.addEventListener('click', () => {
+        removeFromCart(index);
+        displayCart(); // re-render on remove
+      });
+  
+      item.appendChild(removeBtn);
+      list.appendChild(item);
+    });
+  
+    // Total display element
+    const totalDisplay = document.createElement('p');
+    totalDisplay.style.cssText = `
+      font-weight: bold;
+      font-size: 18px;
+      margin: 10px 0 20px;
+    `;
+    const updateTotal = (isDelivery) => {
+      totalDisplay.textContent = `Total: €${getTotalAmount(isDelivery).toFixed(2)}`;
+    };
+  
+    // User details form
+    const form = document.createElement('form');
+    form.innerHTML = `
+      <h3>Enter your details:</h3>
+      <label for="userName">Your Name:</label>
+      <input type="text" id="userName" name="userName" required /><br>
+  
+      <label for="userPhone">Your Phone:</label>
+      <input type="tel" id="userPhone" name="userPhone" required /><br>
+  
+      <label for="deliveryOption">Delivery:</label>
+      <input type="checkbox" id="deliveryOption" name="deliveryOption" />
+      <label for="deliveryOption">Check if you want delivery</label><br>
+  
+      <div id="deliveryAddress" style="display: none;">
+        <label for="userAddress">Delivery Address:</label>
+        <textarea id="userAddress" name="userAddress" placeholder="Enter delivery address"></textarea><br>
+        <p>Delivery charge: €4</p>
+      </div>
+  
+      <button type="submit">Submit All Orders</button>
+    `;
+  
+    const deliveryCheckbox = form.querySelector('#deliveryOption');
+    const deliveryAddressDiv = form.querySelector('#deliveryAddress');
+  
+    // Initial total
+    updateTotal(false);
+  
+    // Toggle delivery input and update total
+    deliveryCheckbox.addEventListener('change', () => {
+      const isDelivery = deliveryCheckbox.checked;
+      deliveryAddressDiv.style.display = isDelivery ? 'block' : 'none';
+      updateTotal(isDelivery);
+    });
+  
+    // Form submit handler
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+    
+      const userName = form.userName.value.trim();
+      const userPhone = form.userPhone.value.trim();
+      const isDelivery = deliveryCheckbox.checked;
+      const deliveryAddress = isDelivery ? form.userAddress.value.trim() : null;
+    
+      if (!userName || !userPhone || (isDelivery && !deliveryAddress)) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+    
+      const totalAmount = getTotalAmount(isDelivery);
+    
       const orderDetails = {
         userName,
         userPhone,
         isDelivery,
         deliveryAddress,
-        meal: meal.strMeal,
-        price: totalPrice
+        cart,
+        totalAmount
       };
-
+    
       submitOrder(orderDetails);
+    
+      localStorage.removeItem('orderCart');
+      modal.style.display = 'none';
     });
+    
+  
+    // Append everything to modal
+    recipeDetails.appendChild(list);
+    recipeDetails.appendChild(totalDisplay);
+    recipeDetails.appendChild(form);
+  }
+  
 
-    const orderDetails = {
-      userName,
-      userPhone,
-      isDelivery,
-      deliveryAddress,
-      meals: meal.strMeal,
-      price: totalPrice
-    };
 
-    localStorage.removeItem('orderCart');
-    modal.style.display = 'none';
-  });
+function getCart() {
+  return JSON.parse(localStorage.getItem('orderCart')) || [];
+}
 
-  recipeDetails.appendChild(list);
-  recipeDetails.appendChild(form);
-  modal.style.display = 'flex';
+function getTotalCost(isDelivery = false) {
+  const cart = getCart();
+  let total = cart.reduce((sum, meal) => sum + Number(meal.price), 0);
+  if (isDelivery) total += 4;
+  return total.toFixed(2);
 }
 
 
 function removeFromCart(index) {
-  let cart = JSON.parse(localStorage.getItem('orderCart')) || [];
+  let cart = getCart();
   cart.splice(index, 1);
   localStorage.setItem('orderCart', JSON.stringify(cart));
+  getTotalAmount();
 }
+
+let totalAmount = 0;
+
+function getTotalAmount(isDelivery = false) {
+  const cart = getCart();
+  totalAmount = cart.reduce((sum, meal) => sum + (Number(meal.price) || 0), 0);
+  if (isDelivery) {
+    totalAmount += 4;
+  }
+  return totalAmount;
+}
+
 
 
 });
